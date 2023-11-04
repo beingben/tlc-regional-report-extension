@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "TLC Regional Report Viewer",
+    "version": "1.0",
+    "description": "Author: Ben Hamilton, Email: benhami@gmail.com, License: MIT",
+    "permissions": ["activeTab"],
+    "author": "Ben Hamilton",
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon32.png",
+        "128": "icon96.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [{
+        "matches": ["https://www.traillifeconnect.com/*"],
+        "js": ["content.js"]
+    }]
+}
