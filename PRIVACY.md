@@ -2,7 +2,7 @@
 
 ## Intro
 
-Different extensions use personal data in different ways. This privacy policy encompasses general principles of how extensions I create collect and handle personal data. Individual extensions, when you first use them, will display their own unique privacy policies and ask you to agree to them before continued use.
+Different extensions use personal data in different ways. This privacy policy encompasses general principles of how extensions I create collect and handle personal data. Individual extensions, when you first use them, will display their own unique privacy policies and ask you to agree to them before continued use if they make use of private information; otherwise, this policy will cover all extensions I create which do not use private information.
 
 ## Data Collection
 
