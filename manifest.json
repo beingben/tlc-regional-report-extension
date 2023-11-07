@@ -17,7 +17,7 @@
         "default_popup": "popup.html"
     },
     "content_scripts": [{
+        "matches": ["https://www.traillifeconnect.com/*"],
         "js": ["content.js"]
     }]
 }
-
