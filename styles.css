@@ -2,3 +2,55 @@ body {
   min-width: 200px;
   overflow-x: hidden;
 }
+
+/* add css for table cells to have a border */
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+table {
+  border-spacing: 0;
+}
+
+/* th has a background color of #876338 */
+th {
+  background-color: #876338;
+    /* background-color: #bc2630; */
+    color: white;
+  }
+
+  /* table rows have alternating background colors between #ffffff and #bc2630 */
+  tr:nth-child(even) {
+    background-color: #d1a054;
+  }
+
+  tr:nth-child(odd) {
+    /* background-color: #bc2630; */
+    background-color: #ffffff;
+  }
+
+  other-color {
+    background-color: #876338;
+    accent-color: #d1a054;
+    background-color: #000000;
+    accent-color: #808080;
+    background-color: #ffffff;
+    accent-color: #d1d1d1;
+    background-color: #bc2630;
+    accent-color: #ff6961;
+    background-color: #876338;
+    accent-color: #d1a054;
+    background-color: #bc262e;
+    accent-color: #ff6961;
+    background-color: #ba2730;
+    accent-color: #ff6961;
+    background-color: #88643a;
+    accent-color: #d1a054;
+    background-color: #fffffd;
+    accent-color: #f0f0f0;
+    background-color: #ba272e;
+    accent-color: #ff6961;
+    background-color: #bc2632;
+    accent-color: #ff6961;
+    color: white;
+}
