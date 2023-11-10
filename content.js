@@ -6,9 +6,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     let data = [];
 
     for (let i = 2; i < rows.length; i++) {
-      // if (i === 0) continue;
-      // if (i === 1) continue;
-
+      
       let cells = rows[i].cells;
       let dataKeyCell = cells[0];
       let dataKey = dataKeyCell.querySelector('.kv-expanded-row').getAttribute('data-key');
@@ -16,15 +14,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       let profileLink = `https://www.traillifeconnect.com/profile/${dataKey}/overview`;
 
       let rolesCell = cells[4];
-      let roles = [];
+      let roles = new Set(); // Use a Set to keep track of unique roles
 
       // Check for span elements
       let spans = rolesCell.querySelectorAll('span');
       for (let j = 0; j < spans.length; j++) {
         if (j === 0) {
-          roles.push(...spans[j].innerText.split(','));
+          roles.add(...spans[j].innerText.split(',')); // Use Set.add() to add unique roles
         } else {
-          roles.push(spans[j].innerText);
+          roles.add(spans[j].innerText);
         }
       }
 
@@ -33,7 +31,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       imgs.forEach(img => {
         let roleTitles = img.getAttribute('data-original-title').split(',');
         roleTitles.forEach(title => {
-          roles.push(title.trim());
+          roles.add(title.trim());
         });
       });
 
@@ -41,25 +39,25 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       let is = rolesCell.querySelectorAll('i');
       is.forEach(i => {
         let roleTitles = i.getAttribute('data-original-title').split('<br>');
-        roles.push(roleTitles[0]);
+        roles.add(roleTitles[0]);
       });
 
       let troopName = cells[7].innerText;
       let troopLink = cells[7].querySelector('a').href;
       let troopCity = cells[8].innerText;
 
-      for (let j = 0; j < roles.length; j++) {
+      roles.forEach(role => { // Loop through the Set to add each unique role
         let rowData = {
           name: name,
           profileLink: profileLink,
-          role: roles[j].trim(),
+          role: role.trim(),
           troopName: troopName,
           troopLink: troopLink,
           troopCity: troopCity
         };
 
         data.push(rowData);
-      }
+      });
     }
 
     sendResponse(data);
