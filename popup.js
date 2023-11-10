@@ -1,4 +1,6 @@
 // popup.js
+let allRows = [];
+
 document.getElementById('continue-button').addEventListener('click', function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {message: 'get_data'}, function(response) {
@@ -6,6 +8,9 @@ document.getElementById('continue-button').addEventListener('click', function() 
         console.error(chrome.runtime.lastError.message);
         return;
       }
+
+      // Store the original data in allRows
+      allRows = response;
 
       // Clear the popup
       document.body.innerHTML = '';
@@ -50,8 +55,8 @@ document.getElementById('continue-button').addEventListener('click', function() 
               otherSelector.value = '';
             }
           });
-          sortTable([...headerRow.children].indexOf(th), this.value);
           filterTable();
+          sortTable([...headerRow.children].indexOf(th), this.value);
         });
         th.appendChild(document.createTextNode(text));
         th.appendChild(document.createElement('br'));
@@ -103,8 +108,8 @@ document.getElementById('continue-button').addEventListener('click', function() 
               otherSelector.value = '';
             }
           });
-          sortTable([...headerRow.children].indexOf(sortSelector.parentNode), this.value);
           filterTable();
+          sortTable([...headerRow.children].indexOf(sortSelector.parentNode), this.value);
         });
       });
 
@@ -114,7 +119,7 @@ document.getElementById('continue-button').addEventListener('click', function() 
       downloadButton.addEventListener('click', function() {
         // Convert the filtered table to CSV format
         let csv = 'Name,Profile Link,Role,Troop Name,Troop Link,City\n';
-        let filteredRows = tbody.querySelectorAll('tr:not([style*="display: none"])');
+        let filteredRows = Array.from(tbody.querySelectorAll('tr'));
         filteredRows.forEach(row => {
           let rowData = {
             name: row.querySelectorAll('td')[0].textContent,
@@ -142,28 +147,51 @@ document.getElementById('continue-button').addEventListener('click', function() 
       // Function to filter and sort the table based on all filter inputs and sort selectors
       function filterTable() {
         let filterInputs = headerRow.querySelectorAll('input[type="text"]');
-        let rows = tbody.querySelectorAll('tr');
-        rows.forEach(row => {
+        let rows = allRows.filter(rowData => {
           let shouldDisplay = true;
           filterInputs.forEach((filterInput, index) => {
             let filterValue = filterInput.value.toLowerCase();
             if (filterValue.length >= 2) { // Only filter if at least two characters have been entered
-              let cellValue = row.querySelectorAll('td')[index].textContent.toLowerCase();
+              let cellValue = rowData[['name', 'role', 'troopName', 'troopCity'][index]].toLowerCase();
               if (!cellValue.includes(filterValue)) {
                 shouldDisplay = false;
               }
             }
           });
-          row.style.display = shouldDisplay ? '' : 'none';
+          return shouldDisplay;
         });
+        tbody.innerHTML = '';
+        rows.forEach(rowData => {
+          let row = document.createElement('tr');
+          ['name', 'role', 'troopName', 'troopCity'].forEach(key => {
+            let td = document.createElement('td');
+            if (key === 'name') {
+              let link = document.createElement('a');
+              link.href = rowData.profileLink;
+              link.textContent = rowData[key];
+              td.appendChild(link);
+            } else if (key === 'troopName') {
+              let link = document.createElement('a');
+              link.href = rowData.troopLink;
+              link.textContent = rowData[key];
+              td.appendChild(link);
+            } else {
+              td.textContent = rowData[key];
+            }
+            td.style.whiteSpace = 'nowrap';
+            row.appendChild(td);
+          });
+          tbody.appendChild(row);
+        });
+        sortTable();
       }
 
       // Function to sort the table based on the selected column and sort order
       function sortTable(columnIndex, sortOrder) {
-        let rows = Array.from(tbody.querySelectorAll('tr:not([style*="display: none"])'));
+        let rows = Array.from(tbody.querySelectorAll('tr'));
         rows.sort(function(a, b) {
-          let aCellValue = a.querySelectorAll('td')[columnIndex].textContent;
-          let bCellValue = b.querySelectorAll('td')[columnIndex].textContent;
+          let aCellValue = a.querySelectorAll('td')[columnIndex]?.textContent;
+          let bCellValue = b.querySelectorAll('td')[columnIndex]?.textContent;
           if (sortOrder === 'asc') {
             return aCellValue.localeCompare(bCellValue);
           } else if (sortOrder === 'desc') {
