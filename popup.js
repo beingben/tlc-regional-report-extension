@@ -19,8 +19,45 @@ document.getElementById('continue-button').addEventListener('click', function() 
       let headerRow = document.createElement('tr');
       ['Name', 'Role', 'Troop Name', 'Troop City'].forEach(text => {
         let th = document.createElement('th');
-        th.textContent = text;
         th.style.whiteSpace = 'nowrap';
+
+        // Create the filter input
+        let filterInput = document.createElement('input');
+        filterInput.type = 'text';
+        filterInput.placeholder = 'Matches...';
+        filterInput.addEventListener('input', function() {
+          filterTable();
+        });
+
+        // Create the sort selector
+        let sortSelector = document.createElement('select');
+        let defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.text = 'Sort Order';
+        sortSelector.add(defaultOption);
+        let ascOption = document.createElement('option');
+        ascOption.value = 'asc';
+        ascOption.text = 'Ascending';
+        sortSelector.add(ascOption);
+        let descOption = document.createElement('option');
+        descOption.value = 'desc';
+        descOption.text = 'Descending';
+        sortSelector.add(descOption);
+        sortSelector.addEventListener('change', function() {
+          // Clear/reset the value/state of other selectors before applying the sort
+          headerRow.querySelectorAll('select').forEach(otherSelector => {
+            if (otherSelector !== sortSelector) {
+              otherSelector.value = '';
+            }
+          });
+          sortTable([...headerRow.children].indexOf(th), this.value);
+          filterTable();
+        });
+        th.appendChild(document.createTextNode(text));
+        th.appendChild(document.createElement('br'));
+        th.appendChild(filterInput);
+        th.appendChild(sortSelector);
+
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
@@ -32,17 +69,15 @@ document.getElementById('continue-button').addEventListener('click', function() 
         ['name', 'role', 'troopName', 'troopCity'].forEach(key => {
           let td = document.createElement('td');
           if (key === 'name') {
-            let a = document.createElement('a');
-            a.href = rowData["profileLink"];
-            a.innerText = rowData[key];
-            a.target = '_blank'; // Add this line to open the link in a new tab
-            td.appendChild(a);
+            let link = document.createElement('a');
+            link.href = rowData.profileLink;
+            link.textContent = rowData[key];
+            td.appendChild(link);
           } else if (key === 'troopName') {
-            let a = document.createElement('a');
-            a.href = rowData["troopLink"];
-            a.innerText = rowData[key];
-            a.target = '_blank'; // Add this line to open the link in a new tab
-            td.appendChild(a);
+            let link = document.createElement('a');
+            link.href = rowData.troopLink;
+            link.textContent = rowData[key];
+            td.appendChild(link);
           } else {
             td.textContent = rowData[key];
           }
@@ -53,14 +88,43 @@ document.getElementById('continue-button').addEventListener('click', function() 
       });
       table.appendChild(tbody);
 
+      // Add event listeners to filter inputs and sort selectors
+      headerRow.querySelectorAll('input[type="text"]').forEach(filterInput => {
+        filterInput.addEventListener('input', function() {
+          filterTable();
+          sortTable();
+        });
+      });
+      headerRow.querySelectorAll('select').forEach(sortSelector => {
+        sortSelector.addEventListener('change', function() {
+          // Clear/reset the value/state of other selectors before applying the sort
+          headerRow.querySelectorAll('select').forEach(otherSelector => {
+            if (otherSelector !== sortSelector) {
+              otherSelector.value = '';
+            }
+          });
+          sortTable([...headerRow.children].indexOf(sortSelector.parentNode), this.value);
+          filterTable();
+        });
+      });
+
       // Create the download button
       let downloadButton = document.createElement('button');
       downloadButton.textContent = 'Download CSV';
       downloadButton.addEventListener('click', function() {
-        // Convert the table to CSV format
-        let csv = 'Name,Profile link,Role,Troop Name,Troop Link,Troop City\n';
-        response.forEach(rowData => {
-          csv += `"${rowData.name}","${rowData.profileLink}","${rowData.role}","${rowData.troopName}","${rowData.troopLink}","${rowData.troopCity}"\n`;
+        // Convert the filtered table to CSV format
+        let csv = 'Name,Profile Link,Role,Troop Name,Troop Link,City\n';
+        let filteredRows = tbody.querySelectorAll('tr:not([style*="display: none"])');
+        filteredRows.forEach(row => {
+          let rowData = {
+            name: row.querySelectorAll('td')[0].textContent,
+            profileLink: row.querySelectorAll('td a')[0].href,
+            role: row.querySelectorAll('td')[1].textContent,
+            troopName: row.querySelectorAll('td')[2].textContent,
+            troopLink: row.querySelectorAll('td a')[1].href,
+            city: row.querySelectorAll('td')[3].textContent
+          };
+          csv += `"${rowData.name}","${rowData.profileLink}","${rowData.role}","${rowData.troopName}","${rowData.troopLink}","${rowData.city}"\n`;
         });
 
         // Download the CSV file
@@ -74,6 +138,44 @@ document.getElementById('continue-button').addEventListener('click', function() 
 
       // Append the table to the body
       document.body.appendChild(table);
+
+      // Function to filter and sort the table based on all filter inputs and sort selectors
+      function filterTable() {
+        let filterInputs = headerRow.querySelectorAll('input[type="text"]');
+        let rows = tbody.querySelectorAll('tr');
+        rows.forEach(row => {
+          let shouldDisplay = true;
+          filterInputs.forEach((filterInput, index) => {
+            let filterValue = filterInput.value.toLowerCase();
+            if (filterValue.length >= 2) { // Only filter if at least two characters have been entered
+              let cellValue = row.querySelectorAll('td')[index].textContent.toLowerCase();
+              if (!cellValue.includes(filterValue)) {
+                shouldDisplay = false;
+              }
+            }
+          });
+          row.style.display = shouldDisplay ? '' : 'none';
+        });
+      }
+
+      // Function to sort the table based on the selected column and sort order
+      function sortTable(columnIndex, sortOrder) {
+        let rows = Array.from(tbody.querySelectorAll('tr:not([style*="display: none"])'));
+        rows.sort(function(a, b) {
+          let aCellValue = a.querySelectorAll('td')[columnIndex].textContent;
+          let bCellValue = b.querySelectorAll('td')[columnIndex].textContent;
+          if (sortOrder === 'asc') {
+            return aCellValue.localeCompare(bCellValue);
+          } else if (sortOrder === 'desc') {
+            return bCellValue.localeCompare(aCellValue);
+          } else {
+            return 0;
+          }
+        });
+        rows.forEach(row => {
+          tbody.appendChild(row);
+        });
+      }
 
     });
   });
