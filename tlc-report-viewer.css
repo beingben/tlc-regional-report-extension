@@ -1,6 +1,11 @@
 body.tlc-report-viewer {
-  min-width: 200px;
-  overflow-x: hidden;
+  min-width: 600px;
+  /* overflow-x: hidden; */
+}
+
+table.tlc-report-viewer {
+  min-width: 600px;
+  /* overflow-x: hidden; */
 }
 
 /* add css for table cells to have a border */

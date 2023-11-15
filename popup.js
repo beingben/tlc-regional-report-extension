@@ -1,6 +1,56 @@
 // popup.js
 let allRows = [];
 
+function createTableHeader(headerNames) {
+  let headerRow = document.createElement('tr');
+  headerRow.classList.add('tlc-report-viewer');
+  headerNames.forEach(text => {
+    let th = document.createElement('th');
+    th.classList.add('tlc-report-viewer');
+    th.style.whiteSpace = 'nowrap';
+
+    // Create the filter input
+    let filterInput = document.createElement('input');
+    filterInput.type = 'text';
+    filterInput.placeholder = 'Matches...';
+    filterInput.addEventListener('input', function() {
+      filterTable();
+    });
+
+    // Create the sort selector
+    let sortSelector = document.createElement('select');
+    let defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.text = 'Sort Order';
+    sortSelector.add(defaultOption);
+    let ascOption = document.createElement('option');
+    ascOption.value = 'asc';
+    ascOption.text = 'Ascending';
+    sortSelector.add(ascOption);
+    let descOption = document.createElement('option');
+    descOption.value = 'desc';
+    descOption.text = 'Descending';
+    sortSelector.add(descOption);
+    sortSelector.addEventListener('change', function() {
+      // Clear/reset the value/state of other selectors before applying the sort
+      headerRow.querySelectorAll('select').forEach(otherSelector => {
+        if (otherSelector !== sortSelector) {
+          otherSelector.value = '';
+        }
+      });
+      filterTable();
+      sortTable([...headerRow.children].indexOf(th), this.value);
+    });
+    th.appendChild(document.createTextNode(text));
+    th.appendChild(document.createElement('br'));
+    th.appendChild(filterInput);
+    th.appendChild(sortSelector);
+
+    headerRow.appendChild(th);
+  });
+  return headerRow;
+}
+
 document.getElementById('continue-button').addEventListener('click', function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {message: 'get_data'}, function(response) {
@@ -18,62 +68,21 @@ document.getElementById('continue-button').addEventListener('click', function() 
       // Create a table
       let table = document.createElement('table');
       table.classList.add('tlc-report-viewer'); // Add the class "tlc-report-viewer" to the table element
-      let thead = document.createElement('thead');
-      thead.classList.add('tlc-report-viewer');
-      let tbody = document.createElement('tbody');
-      tbody.classList.add('tlc-report-viewer');
+
 
       // Create the table header
-      let headerRow = document.createElement('tr');
-      headerRow.classList.add('tlc-report-viewer');
-      ['Name', 'Role', 'Troop Name', 'Troop City'].forEach(text => {
-        let th = document.createElement('th');
-        th.classList.add('tlc-report-viewer');
-        th.style.whiteSpace = 'nowrap';
-
-        // Create the filter input
-        let filterInput = document.createElement('input');
-        filterInput.type = 'text';
-        filterInput.placeholder = 'Matches...';
-        filterInput.addEventListener('input', function() {
-          filterTable();
-        });
-
-        // Create the sort selector
-        let sortSelector = document.createElement('select');
-        let defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.text = 'Sort Order';
-        sortSelector.add(defaultOption);
-        let ascOption = document.createElement('option');
-        ascOption.value = 'asc';
-        ascOption.text = 'Ascending';
-        sortSelector.add(ascOption);
-        let descOption = document.createElement('option');
-        descOption.value = 'desc';
-        descOption.text = 'Descending';
-        sortSelector.add(descOption);
-        sortSelector.addEventListener('change', function() {
-          // Clear/reset the value/state of other selectors before applying the sort
-          headerRow.querySelectorAll('select').forEach(otherSelector => {
-            if (otherSelector !== sortSelector) {
-              otherSelector.value = '';
-            }
-          });
-          filterTable();
-          sortTable([...headerRow.children].indexOf(th), this.value);
-        });
-        th.appendChild(document.createTextNode(text));
-        th.appendChild(document.createElement('br'));
-        th.appendChild(filterInput);
-        th.appendChild(sortSelector);
-
-        headerRow.appendChild(th);
-      });
+      let headerRow = createTableHeader(['Name', 'Role', 'Troop Name', 'City']);
+      let thead = document.createElement('thead');
+      thead.classList.add('tlc-report-viewer');
+    
       thead.appendChild(headerRow);
       table.appendChild(thead);
 
       // Create the table body
+      let tbody = document.createElement('tbody');
+      tbody.classList.add('tlc-report-viewer');
+
+      // add rows to the table body
       response.forEach(rowData => {
         let row = document.createElement('tr');
         row.classList.add('tlc-report-viewer');
@@ -198,6 +207,7 @@ document.getElementById('continue-button').addEventListener('click', function() 
       // Function to sort the table based on the selected column and sort order
       function sortTable(columnIndex, sortOrder) {
         let rows = Array.from(tbody.querySelectorAll('tr'));
+        tbody.innerHTML = '';
         rows.sort(function(a, b) {
           let aCellValue = a.querySelectorAll('td')[columnIndex]?.textContent;
           let bCellValue = b.querySelectorAll('td')[columnIndex]?.textContent;
