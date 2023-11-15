@@ -1,29 +1,29 @@
-body {
+body.tlc-report-viewer {
   min-width: 200px;
   overflow-x: hidden;
 }
 
 /* add css for table cells to have a border */
-td {
+td.tlc-report-viewer {
   border: 1px solid black;
   border-collapse: collapse;
 }
-table {
+table.tlc-report-viewer {
   border-spacing: 0;
 }
 
 /* th has a background color of #876338 */
-th {
+th.tlc-report-viewer {
   background-color: #876338;
     /* background-color: #bc2630; */
     color: white;
   }
 
   /* table rows have alternating background colors between #ffffff and #bc2630 */
-  tr:nth-child(even) {
+  tr.tlc-report-viewer:nth-child(even) {
     background-color: #d1a054;
   }
 
-  tr:nth-child(odd) {
+  tr.tlc-report-viewer:nth-child(odd) {
     background-color: #ffffff;
   }
