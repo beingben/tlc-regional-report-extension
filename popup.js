@@ -17,13 +17,18 @@ document.getElementById('continue-button').addEventListener('click', function() 
 
       // Create a table
       let table = document.createElement('table');
+      table.classList.add('tlc-report-viewer'); // Add the class "tlc-report-viewer" to the table element
       let thead = document.createElement('thead');
+      thead.classList.add('tlc-report-viewer');
       let tbody = document.createElement('tbody');
+      tbody.classList.add('tlc-report-viewer');
 
       // Create the table header
       let headerRow = document.createElement('tr');
+      headerRow.classList.add('tlc-report-viewer');
       ['Name', 'Role', 'Troop Name', 'Troop City'].forEach(text => {
         let th = document.createElement('th');
+        th.classList.add('tlc-report-viewer');
         th.style.whiteSpace = 'nowrap';
 
         // Create the filter input
@@ -71,8 +76,10 @@ document.getElementById('continue-button').addEventListener('click', function() 
       // Create the table body
       response.forEach(rowData => {
         let row = document.createElement('tr');
+        row.classList.add('tlc-report-viewer');
         ['name', 'role', 'troopName', 'troopCity'].forEach(key => {
           let td = document.createElement('td');
+          td.classList.add('tlc-report-viewer');
           if (key === 'name') {
             let link = document.createElement('a');
             link.href = rowData.profileLink;
@@ -163,8 +170,10 @@ document.getElementById('continue-button').addEventListener('click', function() 
         tbody.innerHTML = '';
         rows.forEach(rowData => {
           let row = document.createElement('tr');
+          row.classList.add('tlc-report-viewer');
           ['name', 'role', 'troopName', 'troopCity'].forEach(key => {
             let td = document.createElement('td');
+            td.classList.add('tlc-report-viewer');
             if (key === 'name') {
               let link = document.createElement('a');
               link.href = rowData.profileLink;
