@@ -25,7 +25,10 @@ function extractAreaTroopMemberPageData() {
     let spans = rolesCell.querySelectorAll('span');
     for (let j = 0; j < spans.length; j++) {
       if (j === 0) {
-        roles.add(...spans[j].innerText.split(',')); // Use Set.add() to add unique roles
+        role_texts = spans[j].innerText.split(',');
+        for (let k = 0; k < role_texts.length; k++) {
+          roles.add(role_texts[k]); // Use Set.add() to add unique roles
+        }
       } else {
         roles.add(spans[j].innerText);
       }
