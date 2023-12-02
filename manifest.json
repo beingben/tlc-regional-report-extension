@@ -6,16 +6,16 @@
     "permissions": ["activeTab"],
     "author": "Ben Hamilton",
     "icons": {
-        "24": "iconApp24.png",
-        "48": "iconApp48.png",
-        "128": "iconApp128.png"
+        "24": "icons/iconApp24.png",
+        "48": "icons/iconApp48.png",
+        "128": "icons/iconApp128.png"
     },
     "background": {
         "service_worker": "background.js"
     },
     "action": {
         "default_icon": {
-            "48": "iconApp48.png"
+            "48": "icons/iconApp48.png"
         },
         "default_popup": "popup.html"
     },
