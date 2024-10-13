@@ -1,10 +1,5 @@
 // content.js
 
-// Function to extract data from the other page
-function extractMyToopsData() {
-  // Add your code here to extract data from the other page
-}
-
 function extractAreaTroopMemberPageData() { 
   let table = document.querySelector('.table-basic.kv-grid-table.table.table-hover.table-striped.table-condensed');
   let rows = table.rows;
@@ -70,16 +65,127 @@ function extractAreaTroopMemberPageData() {
   return data;
 }
 
+async function extractTroopStatusData() {
+  try {
+      await waitForElement('#w0-container table tbody');
+  } catch (error) {
+      console.error(error);
+      return [];
+  }
+
+  let table = document.querySelector('#w0-container table');
+  let tbody = table.querySelector('tbody');
+  let rows = tbody.rows;
+  let data = [];
+
+  for (let i = 0; i < rows.length; i++) {
+      let cells = rows[i].cells;
+      let cellMap = {};
+      for (let j = 0; j < cells.length; j++) {
+          let dataColSeq = cells[j].getAttribute('data-col-seq');
+          if (dataColSeq !== null) {
+              cellMap[dataColSeq] = cells[j];
+          }
+      }
+
+      // Debugging statements (you can uncomment these for troubleshooting)
+      // console.log(`Row ${i} cellMap:`, cellMap);
+
+      let dataKey = rows[i].getAttribute('data-key');
+
+      let troopNumberCell = cellMap['1'];
+      let statusCell = cellMap['2'];
+      let dateCell = cellMap['3'];
+      let stateCell = cellMap['4'];
+      let countyCell = cellMap['5'];
+      let cityCell = cellMap['6'];
+      let addressCell = cellMap['7'];
+      let areaCell = cellMap['9'];
+      let numberOfMembersCell = cellMap['10'];
+      let numberOfAdultsCell = cellMap['11'];
+      let numberOfYouthCell = cellMap['12'];
+      let percentageCell = cellMap['13'];
+
+      // Safely access innerText with fallback to empty string
+      let troopNumber = '';
+      if (troopNumberCell) {
+          troopNumber = troopNumberCell.innerText ? troopNumberCell.innerText.trim() : '';
+          if (!troopNumber) {
+              // Try getting text from child elements
+              let link = troopNumberCell.querySelector('a');
+              troopNumber = link ? link.innerText.trim() : '';
+          }
+      }
+
+      let status = statusCell ? statusCell.innerText.trim() : '';
+      let date = dateCell ? dateCell.innerText.trim() : '';
+      let state = stateCell ? stateCell.innerText.trim() : '';
+      let county = countyCell ? countyCell.innerText.trim() : '';
+      let city = cityCell ? cityCell.innerText.trim() : '';
+      let address = addressCell ? addressCell.innerText.trim() : '';
+      let area = areaCell ? areaCell.innerText.trim() : '';
+      let numberOfMembers = numberOfMembersCell ? numberOfMembersCell.innerText.trim() : '';
+      let numberOfAdults = numberOfAdultsCell ? numberOfAdultsCell.innerText.trim() : '';
+      let numberOfYouth = numberOfYouthCell ? numberOfYouthCell.innerText.trim() : '';
+      let percentage = percentageCell ? percentageCell.innerText.trim() : '';
+
+      data.push({
+          troopNumber: troopNumber,
+          status: status,
+          date: date,
+          state: state,
+          county: county,
+          city: city,
+          address: address,
+          area: area,
+          numberOfMembers: numberOfMembers,
+          numberOfAdults: numberOfAdults,
+          numberOfYouth: numberOfYouth,
+          percentage: percentage
+      });
+  }
+  return data;
+}
+
+function waitForElement(selector, timeout = 10000) {
+  return new Promise((resolve, reject) => {
+      let timer = 0;
+      const interval = 100;
+      const checkExist = setInterval(() => {
+          const element = document.querySelector(selector);
+          timer += interval;
+          if (element) {
+              clearInterval(checkExist);
+              resolve(element);
+          } else if (timer >= timeout) {
+              clearInterval(checkExist);
+              reject(new Error("Element not found: " + selector));
+          }
+      }, interval);
+  });
+}
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.message === 'get_data') {
 
     let areaTroopMemberData = extractAreaTroopMemberPageData();
     sendResponse(areaTroopMemberData);
 
-  } else if (request.message === 'get_other_data') {
-    // Call the function to extract data from the other page
-    let myToopsData = extractMyToopsData();
+  } else if (request.message === 'get_regional_member_data') {
 
-    sendResponse(myToopsData);
+    let myRegionTeamData = extractMyRegionTeamData();
+    sendResponse(myRegionTeamData);
+
+  } else if (request.message === 'get_regional_team_data') {
+
+    extractTroopStatusData().then((troopStatusData) => {
+      sendResponse(troopStatusData);
+    }).catch((error) => {
+      console.error('Error in extractTroopStatusData:', error);
+      sendResponse([]);
+    });
+
+    // Return true to indicate we'll send a response asynchronously
+    return true;
   }
 });
