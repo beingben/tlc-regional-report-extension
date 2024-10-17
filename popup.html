@@ -1,14 +1,66 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="tlc-report-viewer.css">
-  </head>
-  <body class="tlc-report-viewer">
-    <h1>TLC Regional Report Viewer</h1>
-    <p>This plugin will use only the information available to the current user in the table on screen. If the table has multiple pages available be sure the press the "All" button at the top of the table.</p>
-    <p>Please set your filters on the page, then click "Continue".</p>
-    <button id="troop-member-button">Load Troop Members</button>
-    <button id="regional-team-button">Load Regional Team Members</button>
-    <script src="popup.js"></script>
-  </body>
+<head>
+  <link rel="stylesheet" type="text/css" href="tlc-report-viewer.css">
+  <style>
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      padding-top: 100px;
+      left: 0;
+      top: 0;
+      width: 90%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="tlc-report-viewer">
+  <h1>TLC Regional Report Viewer</h1>
+  <p>This plugin will use only the information available to the current user in the table on screen. If the table has multiple pages available, be sure to press the "All" button at the top of the table.</p>
+  <p>Please set your filters on the page, then click "Continue".</p>
+  <button id="troop-member-button">Load Troop Members</button>
+  <button id="regional-troop-button">Load Regional Troop Data</button>
+  <button id="area-leaders-button">Load Area Leaders</button>
+
+  <!-- Modal Structure -->
+  <div id="instructionsModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Instructions</h2>
+      <p>Please navigate to the <strong>"Area / Regional"</strong> menu and select <strong>"Area Troop Members"</strong>.</p>
+      <p>Ensure all desired records are on one page. We suggest setting a filter of <strong>Youth = No</strong>.</p>
+      <p><strong>Important:</strong> Use the <strong>"Show All Data"</strong> button to display all records on a single page.</p>
+      <p>Once you're on the correct page, click the "Load Troop Members" button again.</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
 </html>
