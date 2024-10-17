@@ -10,7 +10,10 @@ function createTableHeader(headerNames) {
   headerNames.forEach((text) => {
     let th = document.createElement("th");
     th.classList.add("tlc-report-viewer");
-    th.style.whiteSpace = "nowrap";
+    th.style.position = "sticky";
+    th.style.top = "0";
+    th.style.backgroundColor = "#876338"; // Match header background color
+    th.style.zIndex = "1"; // Ensure headers stay above content
 
     // Create the filter input
     let filterInput = document.createElement("input");
@@ -65,7 +68,7 @@ document.getElementById("troop-member-button").addEventListener("click", functio
     const tab = tabs[0];
     const url = tab.url;
 
-    if (url.includes("https://www.traillifeconnect.com/user")) {
+    if (url.includes("https://www.traillifeconnect.com/user/area-troop-members")) {
       // Send message to content script to get troop members
       chrome.tabs.sendMessage(tab.id, { message: "get_troop_members" }, function (response) {
         if (chrome.runtime.lastError) {
@@ -193,8 +196,47 @@ function handleTroopMemberData(data) {
   table.appendChild(thead);
   table.appendChild(tbody);
 
-  // Append the table to the body
-  document.body.appendChild(table);
+  // Create the "Download CSV" button
+  let downloadButton = document.createElement("button");
+  downloadButton.textContent = "Download CSV";
+  downloadButton.classList.add("download-button");
+
+  downloadButton.addEventListener("click", function () {
+    // Convert the data to CSV
+    let csv = headerNames.join(",") + "\n";
+    let dataRows = allRows.map((rowData) => {
+      return [
+        `"${rowData.name}"`,
+        `"${rowData.role}"`,
+        `"${rowData.troopName}"`,
+        `"${rowData.troopCity}"`
+      ].join(",");
+    });
+    csv += dataRows.join("\n");
+    // Download the CSV file
+    let downloadLink = document.createElement("a");
+    downloadLink.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+    downloadLink.download = "troop_members.csv";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  });
+
+  // Create a container div to hold the download button and table
+  let containerDiv = document.createElement("div");
+  containerDiv.classList.add("tlc-container");
+
+  // Create a table container div for scrolling
+  let tableContainerDiv = document.createElement("div");
+  tableContainerDiv.classList.add("tlc-table-container");
+
+  tableContainerDiv.appendChild(table);
+
+  containerDiv.appendChild(downloadButton);
+  containerDiv.appendChild(tableContainerDiv);
+
+  // Append the container to the body
+  document.body.appendChild(containerDiv);
 
   // Add filtering and sorting functionality
   let filterInputs = headerRow.querySelectorAll('input[type="text"]');
@@ -259,31 +301,6 @@ function handleTroopMemberData(data) {
       renderRows(allRows);
     }
   }
-
-  // Create the "Download CSV" button
-  let downloadButton = document.createElement("button");
-  downloadButton.textContent = "Download CSV";
-  downloadButton.addEventListener("click", function () {
-    // Convert the data to CSV
-    let csv = headerNames.join(",") + "\n";
-    let dataRows = allRows.map((rowData) => {
-      return [
-        `"${rowData.name}"`,
-        `"${rowData.role}"`,
-        `"${rowData.troopName}"`,
-        `"${rowData.troopCity}"`
-      ].join(",");
-    });
-    csv += dataRows.join("\n");
-    // Download the CSV file
-    let downloadLink = document.createElement("a");
-    downloadLink.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-    downloadLink.download = "troop_members.csv";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-  });
-  document.body.appendChild(downloadButton);
 }
 
 // Function to handle area leaders data received from content script
@@ -353,8 +370,47 @@ function handleAreaLeadersData(data) {
   table.appendChild(thead);
   table.appendChild(tbody);
 
-  // Append the table to the body
-  document.body.appendChild(table);
+  // Create the "Download CSV" button
+  let downloadButton = document.createElement("button");
+  downloadButton.textContent = "Download CSV";
+  downloadButton.classList.add("download-button");
+
+  downloadButton.addEventListener("click", function () {
+    // Convert the data to CSV
+    let csv = headerNames.join(",") + "\n";
+    let dataRows = allRows.map((rowData) => {
+      return [
+        `"${rowData.name}"`,
+        `"${rowData.role}"`,
+        `"${rowData.expirationDate}"`,
+        `"${rowData.email}"`
+      ].join(",");
+    });
+    csv += dataRows.join("\n");
+    // Download the CSV file
+    let downloadLink = document.createElement("a");
+    downloadLink.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+    downloadLink.download = "area_leaders.csv";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  });
+
+  // Create a container div to hold the download button and table
+  let containerDiv = document.createElement("div");
+  containerDiv.classList.add("tlc-container");
+
+  // Create a table container div for scrolling
+  let tableContainerDiv = document.createElement("div");
+  tableContainerDiv.classList.add("tlc-table-container");
+
+  tableContainerDiv.appendChild(table);
+
+  containerDiv.appendChild(downloadButton);
+  containerDiv.appendChild(tableContainerDiv);
+
+  // Append the container to the body
+  document.body.appendChild(containerDiv);
 
   // Add filtering and sorting functionality
   let filterInputs = headerRow.querySelectorAll('input[type="text"]');
@@ -429,31 +485,6 @@ function handleAreaLeadersData(data) {
       renderRows(allRows);
     }
   }
-
-  // Create the "Download CSV" button
-  let downloadButton = document.createElement("button");
-  downloadButton.textContent = "Download CSV";
-  downloadButton.addEventListener("click", function () {
-    // Convert the data to CSV
-    let csv = headerNames.join(",") + "\n";
-    let dataRows = allRows.map((rowData) => {
-      return [
-        `"${rowData.name}"`,
-        `"${rowData.role}"`,
-        `"${rowData.expirationDate}"`,
-        `"${rowData.email}"`
-      ].join(",");
-    });
-    csv += dataRows.join("\n");
-    // Download the CSV file
-    let downloadLink = document.createElement("a");
-    downloadLink.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-    downloadLink.download = "area_leaders.csv";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-  });
-  document.body.appendChild(downloadButton);
 }
 
 // Function to handle regional troop data received from content script
@@ -532,8 +563,55 @@ function handleRegionalTeamData(data) {
   table.appendChild(thead);
   table.appendChild(tbody);
 
-  // Append the table to the body
-  document.body.appendChild(table);
+  // Create the "Download CSV" button
+  let downloadButton = document.createElement("button");
+  downloadButton.textContent = "Download CSV";
+  downloadButton.classList.add("download-button");
+
+  downloadButton.addEventListener("click", function () {
+    // Convert the data to CSV
+    let csv = headerNames.join(",") + "\n";
+    let dataRows = allRows.map((rowData) => {
+      return [
+        `"${rowData.troopNumber}"`,
+        `"${rowData.status}"`,
+        `"${rowData.date}"`,
+        `"${rowData.state}"`,
+        `"${rowData.county}"`,
+        `"${rowData.city}"`,
+        `"${rowData.address}"`,
+        `"${rowData.area}"`,
+        `"${rowData.numberOfMembers}"`,
+        `"${rowData.numberOfAdults}"`,
+        `"${rowData.numberOfYouth}"`,
+        `"${rowData.percentage}"`
+      ].join(",");
+    });
+    csv += dataRows.join("\n");
+    // Download the CSV file
+    let downloadLink = document.createElement("a");
+    downloadLink.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+    downloadLink.download = "regional_troop_data.csv";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  });
+
+  // Create a container div to hold the download button and table
+  let containerDiv = document.createElement("div");
+  containerDiv.classList.add("tlc-container");
+
+  // Create a table container div for scrolling
+  let tableContainerDiv = document.createElement("div");
+  tableContainerDiv.classList.add("tlc-table-container");
+
+  tableContainerDiv.appendChild(table);
+
+  containerDiv.appendChild(downloadButton);
+  containerDiv.appendChild(tableContainerDiv);
+
+  // Append the container to the body
+  document.body.appendChild(containerDiv);
 
   // Add filtering and sorting functionality
   let filterInputs = headerRow.querySelectorAll('input[type="text"]');
@@ -640,37 +718,4 @@ function handleRegionalTeamData(data) {
       renderRows(allRows);
     }
   }
-
-  // Create the "Download CSV" button
-  let downloadButton = document.createElement("button");
-  downloadButton.textContent = "Download CSV";
-  downloadButton.addEventListener("click", function () {
-    // Convert the data to CSV
-    let csv = headerNames.join(",") + "\n";
-    let dataRows = allRows.map((rowData) => {
-      return [
-        `"${rowData.troopNumber}"`,
-        `"${rowData.status}"`,
-        `"${rowData.date}"`,
-        `"${rowData.state}"`,
-        `"${rowData.county}"`,
-        `"${rowData.city}"`,
-        `"${rowData.address}"`,
-        `"${rowData.area}"`,
-        `"${rowData.numberOfMembers}"`,
-        `"${rowData.numberOfAdults}"`,
-        `"${rowData.numberOfYouth}"`,
-        `"${rowData.percentage}"`
-      ].join(",");
-    });
-    csv += dataRows.join("\n");
-    // Download the CSV file
-    let downloadLink = document.createElement("a");
-    downloadLink.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-    downloadLink.download = "regional_troop_data.csv";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-  });
-  document.body.appendChild(downloadButton);
 }

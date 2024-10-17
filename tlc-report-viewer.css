@@ -1,34 +1,63 @@
+/* tlc-report-viewer.css */
+
+/* Set the minimum width for the body */
 body.tlc-report-viewer {
   min-width: 600px;
-  /* overflow-x: hidden; */
 }
 
+/* Set the minimum width for the table */
 table.tlc-report-viewer {
   min-width: 600px;
-  /* overflow-x: hidden; */
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+  background-color: #ffffff;
 }
 
-/* add css for table cells to have a border */
+/* Add borders to table cells */
 td.tlc-report-viewer {
   border: 1px solid black;
-  border-collapse: collapse;
-}
-table.tlc-report-viewer {
-  border-spacing: 0;
 }
 
-/* th has a background color of #876338 */
+/* Style for table headers */
 th.tlc-report-viewer {
   background-color: #876338;
-    /* background-color: #bc2630; */
-    color: white;
-  }
+  color: white;
+  border: 1px solid black;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  white-space: nowrap;
+}
 
-  /* table rows have alternating background colors between #ffffff and #bc2630 */
-  tr.tlc-report-viewer:nth-child(even) {
-    background-color: #d1a054;
-  }
+/* Table rows have alternating background colors */
+tr.tlc-report-viewer:nth-child(even) {
+  background-color: #d1a054;
+}
 
-  tr.tlc-report-viewer:nth-child(odd) {
-    background-color: #ffffff;
-  }
+tr.tlc-report-viewer:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+/* Ensure the table container scrolls */
+.tlc-table-container {
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: auto;
+}
+
+/* Style for the download button */
+.download-button {
+  margin-bottom: 10px;
+}
+
+/* Add padding to table cells */
+td.tlc-report-viewer,
+th.tlc-report-viewer {
+  padding: 8px;
+  text-align: left;
+}
+
+/* Style the container div */
+.tlc-container {
+  padding: 10px;
+}
