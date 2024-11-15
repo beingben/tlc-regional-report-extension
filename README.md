@@ -12,6 +12,11 @@ This Chrome extension ensures that private information is only visible and acces
 
 ## Releases
 
+**Version 1.5 (2024-11-14)**
+
+- **New Features:**
+  - extended timeout to allow for slower connections and server congestions (from 10 seconds to 60 seconds)
+
 **Version 1.4 (2024-10-20)**
 
 - **New Features:**

@@ -78,7 +78,7 @@ function extractRolesFromCell(rolesCell) {
 // Function to extract data from the "Area Leaders" page
 async function extractAreaLeadersData() {
   // Wait for the table to be present
-  await waitForElement('.table-basic', 10000);
+  await waitForElement('.table-basic', 60000);
 
   let tbody = document.querySelector("tbody");
   if (!tbody) {
@@ -153,7 +153,7 @@ async function extractAreaLeadersData() {
 // Function to extract data from the "Troop Status" page
 async function extractTroopStatusData() {
   try {
-    await waitForElement('#w0-container table tbody');
+    await waitForElement('#w0-container table tbody', 60000);
   } catch (error) {
     console.error(error);
     return [];
@@ -232,7 +232,7 @@ async function extractTroopStatusData() {
 }
 
 // Utility function to wait for an element to be present in the DOM
-function waitForElement(selector, timeout = 10000) {
+function waitForElement(selector, timeout = 60000) {
   return new Promise((resolve, reject) => {
     let timer = 0;
     const interval = 100;
